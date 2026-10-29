@@ -1,0 +1,6 @@
+# Meshes and CAD exchange files are never worth diffing, even ASCII STL.
+*.stl binary
+*.3mf binary
+*.obj binary
+*.step binary
+*.stp binary

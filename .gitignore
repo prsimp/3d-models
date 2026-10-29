@@ -1,0 +1,11 @@
+# Rendered output; regenerate with `make`.
+/build/
+
+# Sliced output. Slicer project files (*.3mf) are kept.
+*.gcode
+*.gcode.3mf
+*.bgcode
+
+/.venv/
+__pycache__/
+.DS_Store

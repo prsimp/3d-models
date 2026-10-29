@@ -1,0 +1,22 @@
+[project]
+name = "3d-models"
+version = "0.0.0"
+description = "build123d models for 3D printing"
+requires-python = ">=3.14"
+dependencies = ["build123d>=0.13"]
+
+[dependency-groups]
+dev = ["ocp-vscode>=4.2", "ruff>=0.17"]
+
+# Building the project installs common/ into .venv, so model scripts can import
+# it from any directory.
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["common"]
+
+[tool.uv]
+# Python comes from mise (see mise.toml); never let uv download its own.
+python-preference = "only-system"

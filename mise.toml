@@ -1,0 +1,9 @@
+# Run `mise install`, then `uv sync` to create .venv with build123d. Once
+# uv.lock exists, mise activates .venv on entering this directory.
+
+[tools]
+python = "3.14.10"
+uv = "0.13.6"
+
+[settings]
+python.uv_venv_auto = true
