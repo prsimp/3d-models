@@ -16,6 +16,13 @@ dimensions in the model. The cutaway runs through the middle slot's plug.
 | --- | --- | --- |
 | ![Empty dock with adapters](images/empty.png) | ![Section through a slot](images/cutaway.png) | ![Cable tunnels in the back wall](images/back.png) |
 
+The one-slot dock, for testing an adapter, cable and bank before printing all
+three:
+
+| From above | From behind |
+| --- | --- |
+| ![One-slot dock with its adapter and cable plug](images/single.png) | ![One-slot dock's cable tunnel](images/single-back.png) |
+
 ## Status
 
 Not yet printed. The dock is 108 x 85 x 60 mm. The banks stand 45 mm deep in
