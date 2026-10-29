@@ -56,6 +56,9 @@ if __name__ == "__main__":
 
 `export` writes `build/<name>.stl` and `build/<name>.step`. Bambu Studio and
 OrcaSlicer import either; STEP keeps true curves rather than a mesh.
+A model can also export variants, such as a test piece: `export(part,
+__file__, variant="test")` writes `build/<name>-test.stl` and `.step`. Export
+variants first; make treats `build/<name>.step` as the sign a model is built.
 
 Keep parameters as constants at the top of the file. Helpers in a model's
 folder import directly (`import clip`); shared code goes in `common/`.
