@@ -44,9 +44,10 @@ dock.
 - `power-bank-dock-clearance-test.stl` and `.step`: a 10 mm tall block with a
   slot at each of 0.2, 0.3, 0.4 and 0.5 mm clearance per side, labelled and
   open top and bottom.
-- `power-bank-dock-single.stl` and `.step`: a dock with one slot, otherwise
-  identical to the full dock: the same walls, adapter pocket, cable channel and
-  tunnel. It is 39 mm wide.
+- `power-bank-dock-single.stl` and `.step`: a dock with one slot and 20 mm
+  walls, 39 x 85 x 35 mm, otherwise identical to the full dock: the same
+  floor, adapter pocket, cable channel and tunnel. Its walls are tall enough
+  to guide a bank onto the plug and hold it upright.
 
 ## Hardware
 
