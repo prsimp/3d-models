@@ -17,7 +17,9 @@ from build123d import (
     Part,
     Pos,
     RectangleRounded,
+    SlotOverall,
     Text,
+    chamfer,
     extrude,
     fillet,
 )
@@ -104,6 +106,17 @@ TEST_LABEL_WALL = 9  # in front of the slots, for the labels
 # to try an adapter, cable and bank together before printing the whole dock.
 SLOT_TEST_WALL_HEIGHT = 10
 
+# The placement test: a thin tray with one slot and a printed stand-in for the
+# adapter's plug where the real one will be, to check that a bank's port finds
+# it before any adapter is to hand. The stand-in is smaller than a real plug
+# (8.25 x 2.4 mm) so that a printed one enters the port.
+PLACEMENT_TEST_FLOOR = 2
+PLACEMENT_TEST_WALL_HEIGHT = 6
+DUMMY_PLUG_WIDTH = 8.0  # Y
+DUMMY_PLUG_THICKNESS = 2.2  # X
+DUMMY_PLUG_LENGTH = 5  # short of the port's depth, so the bank seats on the floor
+DUMMY_PLUG_CHAMFER = 0.4  # around its tip
+
 BOTTOM = (Align.CENTER, Align.CENTER, Align.MIN)
 
 assert PLUG_Y + ADAPTER_BACK + CABLE_PLUG_LENGTH >= SLOT_BACK_Y + MIN_ROOF, (
@@ -189,6 +202,26 @@ slot_test = dock & box(
     FLOOR + SLOT_TEST_WALL_HEIGHT,
 )
 
+tray_height = PLACEMENT_TEST_FLOOR + PLACEMENT_TEST_WALL_HEIGHT
+tray_slot_front = -SLOT_Y / 2
+placement_test = extrude(
+    RectangleRounded(SLOT_X + 2 * WALL, SLOT_Y + 2 * WALL, CORNER_RADIUS),
+    tray_height,
+)
+placement_test = fillet(placement_test.edges().group_by(Axis.Z)[-1], radius=TOP_FILLET)
+placement_test -= Pos(0, 0, tray_height) * slot(CLEARANCE, PLACEMENT_TEST_WALL_HEIGHT)
+placement_test -= engraving(
+    "USB-A", 0, tray_slot_front + LABEL_Y - SLOT_FRONT_Y, PLACEMENT_TEST_FLOOR
+)
+dummy_plug = extrude(
+    SlotOverall(DUMMY_PLUG_WIDTH, DUMMY_PLUG_THICKNESS, rotation=90),
+    DUMMY_PLUG_LENGTH,
+)
+dummy_plug = chamfer(dummy_plug.edges().group_by(Axis.Z)[-1], DUMMY_PLUG_CHAMFER)
+placement_test += (
+    Pos(0, tray_slot_front + PLUG_Y - SLOT_FRONT_Y, PLACEMENT_TEST_FLOOR) * dummy_plug
+)
+
 test_pitch = BANK_THICKNESS + 2 * max(TEST_CLEARANCES) + WALL
 test_y = TEST_LABEL_WALL + BANK_WIDTH + 2 * max(TEST_CLEARANCES) + WALL
 clearance_test = extrude(
@@ -205,5 +238,6 @@ for i, clearance in enumerate(TEST_CLEARANCES):
 
 if __name__ == "__main__":
     export(clearance_test, __file__, variant="clearance-test")
+    export(placement_test, __file__, variant="placement-test")
     export(slot_test, __file__, variant="slot-test")
     export(dock, __file__)
