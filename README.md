@@ -70,5 +70,7 @@ make lint      # ruff check and ruff format --check
 make clean     # remove build/
 ```
 
+CircleCI runs `make lint` on every push; see `.circleci/config.yml`.
+
 Rendered output is not committed. Commit a slicer `.3mf` project when its print
 settings are worth keeping, and leave sliced G-code out.
