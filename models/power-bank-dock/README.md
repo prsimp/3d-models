@@ -7,6 +7,15 @@ Each slides down a slot onto a USB-C plug set into the slot's floor, and comes
 to rest on the floor, so the floor takes its weight and the plug only makes the
 connection.
 
+![Two banks docked and a third lifted out](images/assembled.png)
+
+The renders show placeholder adapters in gold and cable plugs in grey, at the
+dimensions in the model. The cutaway runs through the middle slot's plug.
+
+| From above | Cutaway | From behind |
+| --- | --- | --- |
+| ![Empty dock with adapters](images/empty.png) | ![Section through a slot](images/cutaway.png) | ![Cable tunnels in the back wall](images/back.png) |
+
 ## Status
 
 Not yet printed. The dock is 108 x 85 x 60 mm. The banks stand 45 mm deep in
