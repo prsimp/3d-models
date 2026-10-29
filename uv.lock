@@ -15,6 +15,9 @@ dev = [
     { name = "ocp-vscode" },
     { name = "ruff" },
 ]
+lint = [
+    { name = "ruff" },
+]
 
 [package.metadata]
 requires-dist = [{ name = "build123d", specifier = ">=0.13" }]
@@ -24,6 +27,7 @@ dev = [
     { name = "ocp-vscode", specifier = ">=4.2" },
     { name = "ruff", specifier = ">=0.17" },
 ]
+lint = [{ name = "ruff", specifier = ">=0.17" }]
 
 [[package]]
 name = "anytree"

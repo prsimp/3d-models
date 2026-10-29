@@ -5,8 +5,11 @@ description = "build123d models for 3D printing"
 requires-python = ">=3.14"
 dependencies = ["build123d>=0.13"]
 
+# uv sync installs dev, which includes lint. CI installs lint alone, which
+# skips build123d and the viewer.
 [dependency-groups]
-dev = ["ocp-vscode>=4.2", "ruff>=0.17"]
+dev = ["ocp-vscode>=4.2", { include-group = "lint" }]
+lint = ["ruff>=0.17"]
 
 # Building the project installs common/ into .venv, so model scripts can import
 # it from any directory.

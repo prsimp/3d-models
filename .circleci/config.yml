@@ -1,0 +1,44 @@
+# Lint every pushed commit with ruff.
+#
+# Python and uv come from mise, pinned in mise.toml, so CI runs the versions a
+# local checkout does. Only the lint dependency group is installed: linting
+# does not need build123d, which is by far the largest download.
+#
+# Which pushes start a pipeline (every branch, or only branches with an open
+# pull request) is a CircleCI project setting, not part of this file.
+version: 2.1
+
+jobs:
+  lint:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    environment:
+      MISE_VERSION: v2026.10.22
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-tools-{{ checksum "mise.toml" }}-{{ checksum "uv.lock" }}
+      - run:
+          name: Install mise
+          command: curl -fsSL https://mise.run | sh
+      - run:
+          name: Install Python and uv
+          command: |
+            mise trust mise.toml
+            mise install
+      - save_cache:
+          key: v1-tools-{{ checksum "mise.toml" }}-{{ checksum "uv.lock" }}
+          paths:
+            - ~/.local/share/mise
+            - ~/.cache/uv
+      - run:
+          name: Lint
+          # --locked fails the job if uv.lock is out of date with pyproject.toml.
+          command: mise exec -- make lint RUN="uv run --locked --only-group lint"
+
+workflows:
+  lint:
+    jobs:
+      - lint
