@@ -83,7 +83,6 @@ FLOOR = MIN_SKIN + max(
     ADAPTER_DROP + ADAPTER_HEIGHT,
     ADAPTER_DROP + SOCKET_DEPTH + TUNNEL_HALF_HEIGHT,
 )
-HEIGHT = FLOOR + WALL_HEIGHT
 DOCK_Y = WALL + SLOT_Y + BACK_WALL
 
 SLOT_FRONT_Y = -DOCK_Y / 2 + WALL
@@ -97,6 +96,11 @@ LABEL_Y = SLOT_FRONT_Y + 8
 TEST_CLEARANCES = [0.2, 0.3, 0.4, 0.5]
 TEST_HEIGHT = 10
 TEST_LABEL_WALL = 9  # in front of the slots, for the labels
+
+# The one-slot dock, to try an adapter, cable and bank together before
+# printing all three. Its walls are tall enough to guide a bank well before
+# its port meets the plug, and to keep it from levering on the plug.
+SINGLE_WALL_HEIGHT = 20
 
 BOTTOM = (Align.CENTER, Align.CENTER, Align.MIN)
 
@@ -165,25 +169,25 @@ def engraving(text: str, x: float, y: float, z: float) -> Part:
     )
 
 
-def build_dock(slots: int) -> Part:
-    """The dock with this many slots in a row."""
+def build_dock(slots: int, wall_height: float) -> Part:
+    """The dock with this many slots in a row and walls this tall above the
+    floor."""
     width = slots * SLOT_X + (slots + 1) * WALL
+    height = FLOOR + wall_height
     # Round the blank's top edges before cutting the slots, so that only the
     # outside edges are rounded.
-    dock = extrude(RectangleRounded(width, DOCK_Y, CORNER_RADIUS), HEIGHT)
+    dock = extrude(RectangleRounded(width, DOCK_Y, CORNER_RADIUS), height)
     dock = fillet(dock.edges().group_by(Axis.Z)[-1], radius=TOP_FILLET)
     for i in range(slots):
         x = (i - (slots - 1) / 2) * (SLOT_X + WALL)
-        dock -= Pos(x, SLOT_CENTER_Y, HEIGHT) * slot(CLEARANCE, WALL_HEIGHT)
+        dock -= Pos(x, SLOT_CENTER_Y, height) * slot(CLEARANCE, wall_height)
         dock -= Pos(x, PLUG_Y, FLOOR - ADAPTER_DROP) * adapter_cut()
         dock -= engraving("USB-A", x, LABEL_Y, FLOOR)
     return dock
 
 
-dock = build_dock(SLOTS)
-# One slot of the dock, complete, to try an adapter, cable and bank together
-# before printing all three.
-single = build_dock(1)
+dock = build_dock(SLOTS, WALL_HEIGHT)
+single = build_dock(1, SINGLE_WALL_HEIGHT)
 
 test_pitch = BANK_THICKNESS + 2 * max(TEST_CLEARANCES) + WALL
 test_y = TEST_LABEL_WALL + BANK_WIDTH + 2 * max(TEST_CLEARANCES) + WALL
