@@ -17,9 +17,7 @@ from build123d import (
     Part,
     Pos,
     RectangleRounded,
-    SlotOverall,
     Text,
-    chamfer,
     extrude,
     fillet,
 )
@@ -86,14 +84,12 @@ FLOOR = MIN_SKIN + max(
     ADAPTER_DROP + SOCKET_DEPTH + TUNNEL_HALF_HEIGHT,
 )
 HEIGHT = FLOOR + WALL_HEIGHT
-DOCK_X = SLOTS * SLOT_X + (SLOTS + 1) * WALL
 DOCK_Y = WALL + SLOT_Y + BACK_WALL
 
 SLOT_FRONT_Y = -DOCK_Y / 2 + WALL
 SLOT_BACK_Y = SLOT_FRONT_Y + SLOT_Y
 SLOT_CENTER_Y = (SLOT_FRONT_Y + SLOT_BACK_Y) / 2
 PLUG_Y = SLOT_FRONT_Y + CLEARANCE + PORT_FROM_EDGE
-SLOT_XS = [(i - (SLOTS - 1) / 2) * (SLOT_X + WALL) for i in range(SLOTS)]
 LABEL_Y = SLOT_FRONT_Y + 8
 
 # The clearance test: a short block with a slot at each clearance, open top
@@ -101,21 +97,6 @@ LABEL_Y = SLOT_FRONT_Y + 8
 TEST_CLEARANCES = [0.2, 0.3, 0.4, 0.5]
 TEST_HEIGHT = 10
 TEST_LABEL_WALL = 9  # in front of the slots, for the labels
-
-# The slot test: the middle slot of the dock, cut off this far above the floor,
-# to try an adapter, cable and bank together before printing the whole dock.
-SLOT_TEST_WALL_HEIGHT = 10
-
-# The placement test: a thin tray with one slot and a printed stand-in for the
-# adapter's plug where the real one will be, to check that a bank's port finds
-# it before any adapter is to hand. The stand-in is smaller than a real plug
-# (8.25 x 2.4 mm) so that a printed one enters the port.
-PLACEMENT_TEST_FLOOR = 2
-PLACEMENT_TEST_WALL_HEIGHT = 6
-DUMMY_PLUG_WIDTH = 8.0  # Y
-DUMMY_PLUG_THICKNESS = 2.2  # X
-DUMMY_PLUG_LENGTH = 5  # short of the port's depth, so the bank seats on the floor
-DUMMY_PLUG_CHAMFER = 0.4  # around its tip
 
 BOTTOM = (Align.CENTER, Align.CENTER, Align.MIN)
 
@@ -184,43 +165,25 @@ def engraving(text: str, x: float, y: float, z: float) -> Part:
     )
 
 
-# Round the blank's top edges before cutting the slots, so that only the
-# outside edges are rounded.
-dock = extrude(RectangleRounded(DOCK_X, DOCK_Y, CORNER_RADIUS), HEIGHT)
-dock = fillet(dock.edges().group_by(Axis.Z)[-1], radius=TOP_FILLET)
-for x in SLOT_XS:
-    dock -= Pos(x, SLOT_CENTER_Y, HEIGHT) * slot(CLEARANCE, WALL_HEIGHT)
-    dock -= Pos(x, PLUG_Y, FLOOR - ADAPTER_DROP) * adapter_cut()
-    dock -= engraving("USB-A", x, LABEL_Y, FLOOR)
+def build_dock(slots: int) -> Part:
+    """The dock with this many slots in a row."""
+    width = slots * SLOT_X + (slots + 1) * WALL
+    # Round the blank's top edges before cutting the slots, so that only the
+    # outside edges are rounded.
+    dock = extrude(RectangleRounded(width, DOCK_Y, CORNER_RADIUS), HEIGHT)
+    dock = fillet(dock.edges().group_by(Axis.Z)[-1], radius=TOP_FILLET)
+    for i in range(slots):
+        x = (i - (slots - 1) / 2) * (SLOT_X + WALL)
+        dock -= Pos(x, SLOT_CENTER_Y, HEIGHT) * slot(CLEARANCE, WALL_HEIGHT)
+        dock -= Pos(x, PLUG_Y, FLOOR - ADAPTER_DROP) * adapter_cut()
+        dock -= engraving("USB-A", x, LABEL_Y, FLOOR)
+    return dock
 
-slot_test = dock & box(
-    -SLOT_X / 2 - WALL,
-    SLOT_X / 2 + WALL,
-    -DOCK_Y,
-    DOCK_Y,
-    0,
-    FLOOR + SLOT_TEST_WALL_HEIGHT,
-)
 
-tray_height = PLACEMENT_TEST_FLOOR + PLACEMENT_TEST_WALL_HEIGHT
-tray_slot_front = -SLOT_Y / 2
-placement_test = extrude(
-    RectangleRounded(SLOT_X + 2 * WALL, SLOT_Y + 2 * WALL, CORNER_RADIUS),
-    tray_height,
-)
-placement_test = fillet(placement_test.edges().group_by(Axis.Z)[-1], radius=TOP_FILLET)
-placement_test -= Pos(0, 0, tray_height) * slot(CLEARANCE, PLACEMENT_TEST_WALL_HEIGHT)
-placement_test -= engraving(
-    "USB-A", 0, tray_slot_front + LABEL_Y - SLOT_FRONT_Y, PLACEMENT_TEST_FLOOR
-)
-dummy_plug = extrude(
-    SlotOverall(DUMMY_PLUG_WIDTH, DUMMY_PLUG_THICKNESS, rotation=90),
-    DUMMY_PLUG_LENGTH,
-)
-dummy_plug = chamfer(dummy_plug.edges().group_by(Axis.Z)[-1], DUMMY_PLUG_CHAMFER)
-placement_test += (
-    Pos(0, tray_slot_front + PLUG_Y - SLOT_FRONT_Y, PLACEMENT_TEST_FLOOR) * dummy_plug
-)
+dock = build_dock(SLOTS)
+# One slot of the dock, complete, to try an adapter, cable and bank together
+# before printing all three.
+single = build_dock(1)
 
 test_pitch = BANK_THICKNESS + 2 * max(TEST_CLEARANCES) + WALL
 test_y = TEST_LABEL_WALL + BANK_WIDTH + 2 * max(TEST_CLEARANCES) + WALL
@@ -238,6 +201,5 @@ for i, clearance in enumerate(TEST_CLEARANCES):
 
 if __name__ == "__main__":
     export(clearance_test, __file__, variant="clearance-test")
-    export(placement_test, __file__, variant="placement-test")
-    export(slot_test, __file__, variant="slot-test")
+    export(single, __file__, variant="single")
     export(dock, __file__)

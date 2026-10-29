@@ -44,11 +44,9 @@ dock.
 - `power-bank-dock-clearance-test.stl` and `.step`: a 10 mm tall block with a
   slot at each of 0.2, 0.3, 0.4 and 0.5 mm clearance per side, labelled and
   open top and bottom.
-- `power-bank-dock-placement-test.stl` and `.step`: an 8 mm tall tray with one
-  slot and a printed stand-in for the adapter's plug where the real one will
-  be. It needs no hardware and prints quickly.
-- `power-bank-dock-slot-test.stl` and `.step`: the dock's middle slot, cut off
-  10 mm above the floor, with its adapter pocket and cable tunnel.
+- `power-bank-dock-single.stl` and `.step`: a dock with one slot, otherwise
+  identical to the full dock: the same walls, adapter pocket, cable channel and
+  tunnel. It is 39 mm wide.
 
 ## Hardware
 
@@ -71,16 +69,17 @@ lifts, a dab of hot glue in the pocket will hold it.
 1. Print the clearance test and push a bank through each slot. Choose the
    tightest one it slides through without forcing, and set `CLEARANCE` to that
    value.
-2. Print the placement test and drop a bank in, USB-A toward the label. The
-   stand-in plug should enter the USB-C port and the bank should sit flat on
-   the floor. If the bank rests on the plug instead, the port is not where the
-   model puts it: check `PORT_FROM_EDGE` and that the port is centred across
-   the thickness.
-3. Measure an adapter and a cable plug, and replace the placeholder dimensions.
+2. Measure an adapter and a cable plug, and replace the placeholder dimensions.
    `ADAPTER_DROP` sets how far below the floor the adapter's top face sits; the
    plug's metal shell must still reach fully into the bank's port.
-4. Print the slot test. Fit an adapter and cable, and drop a bank in to check
-   that it seats on the plug and charges.
+3. Print the one-slot dock and fit an adapter and cable. Drop a bank in, USB-A
+   toward the label, and check that:
+   - it slides onto the plug and sits flat on the floor. If it rests on the
+     plug instead, the port is not where the model puts it: check
+     `PORT_FROM_EDGE` and that the port is centred across the thickness;
+   - it charges;
+   - the adapter stays in its pocket when you lift the bank out.
+4. Print the full dock.
 
 ## Printing
 
