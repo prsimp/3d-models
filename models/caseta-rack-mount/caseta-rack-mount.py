@@ -31,6 +31,7 @@ from build123d import (
 )
 
 from common.export import export
+from common.preview import preview
 
 # The Smart Bridge (L-BDG2) is 2.75 x 2.75 x 1.19 in.
 BRIDGE_WIDTH = 69.9
@@ -205,4 +206,5 @@ if __name__ == "__main__":
     export(right(left_3), __file__, variant="right")
     export(left_2, __file__, variant="2-hole")
     export(right(left_2), __file__, variant="right-2-hole")
+    preview(left_3, __file__)
     export(left_3, __file__)

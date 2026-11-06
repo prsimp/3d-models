@@ -1,5 +1,7 @@
 # Caseta rack mount
 
+![The left-hand mount from the front left and the back right](preview.png)
+
 A corner rack mount for a Lutron Caseta Smart Bridge (L-BDG2), in the style
 of a Philips Hue Bridge corner mount: an open tray with hexagon windows,
 whose front wall carries on past one side as a 1U ear.
