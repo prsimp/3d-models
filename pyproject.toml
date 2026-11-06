@@ -3,7 +3,11 @@ name = "3d-models"
 version = "0.0.0"
 description = "build123d models for 3D printing"
 requires-python = ">=3.14"
-dependencies = ["build123d>=0.13"]
+dependencies = [
+    "build123d>=0.13",
+    "numpy>=2.5.4",
+    "pillow>=13.0.0",
+]
 
 # uv sync installs dev, which includes lint. CI installs lint alone, which
 # skips build123d and the viewer.
