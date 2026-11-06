@@ -16,7 +16,6 @@ Show what a model looks like whenever you can.
   image at the pushed commit,
   `https://github.com/prsimp/3d-models/blob/<sha>/models/<name>/preview.png?raw=true`.
   Use the full SHA, so the image stays put when the branch moves on.
-- When one view cannot show the change, such as a variant, a test piece or a
-  detail hidden in the default views, render extra views with `preview(...,
-  views=...)` to a scratch file and attach those too, or say what they would
-  have shown.
+- When the preview cannot show the change, such as a variant, a test piece
+  or a detail hidden in both views, say so in the body: images can only come
+  from files committed to the repository.
