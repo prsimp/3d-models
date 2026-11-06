@@ -1,5 +1,7 @@
 # LX570 dash rail
 
+![The rail from the front left and the back right](preview.png)
+
 A U-shaped accessory rail for the center speaker cover (55510-60040) of a
 2008-2015 Lexus LX570, in the spirit of the
 [Leather & Dirt dash mount](https://leatheranddirt.com/vehicle/2008-2015-lexus-lx570/dash-mount-2008-lexus-lx570/).

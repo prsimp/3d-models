@@ -27,6 +27,7 @@ from build123d import (
 )
 
 from common.export import export
+from common.preview import preview
 
 # The cover's underside measures 235 x 234 mm inside its walls. Two long ribs
 # run front to back, 168 mm apart with a 31 mm strip outside each, and a
@@ -172,6 +173,7 @@ test_piece = rail & Pos(TEST_MIN_X + WIDTH / 2, TEST_MAX_Y - DEPTH / 2) * Box(
 
 if __name__ == "__main__":
     export(test_piece, __file__, variant="test")
+    preview(rail, __file__)
     export(rail, __file__)
     paper_template.write(
         outline,
