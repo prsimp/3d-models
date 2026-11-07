@@ -2,7 +2,8 @@
 
 An open tray holds the bridge beside a rack post. Its front wall carries on
 past one side of the tray as a 1U ear, which screws to the post; the tray's
-far wall has a wide notch for the bridge's cables. The style follows a
+far wall has a wide notch for the bridge's cables, and dimples in the floor
+take the bridge's rubber feet. The style follows a
 Philips Hue Bridge corner mount: hexagon windows in the walls, and the ear
 rising above the walls in a smooth curve.
 
@@ -14,6 +15,7 @@ on the left (-X) when seen from the front; the right mount mirrors it.
 from build123d import (
     Align,
     Axis,
+    Box,
     Circle,
     Part,
     Plane,
@@ -33,10 +35,19 @@ from build123d import (
 from common.export import export
 from common.preview import preview
 
-# The Smart Bridge (L-BDG2) is 2.75 x 2.75 x 1.19 in.
-BRIDGE_WIDTH = 69.9
+# The Smart Bridge (L-BDG2), as measured. Lutron gives 2.75 x 2.75 x 1.19 in
+# (69.9 x 69.9 x 30.2 mm), but a pocket sized from that was loose.
+BRIDGE_WIDTH = 69.5
 BRIDGE_HEIGHT = 30.2
-CLEARANCE = 1.5  # around the bridge, each side
+CLEARANCE = 0.5  # around the bridge, each side; the feet locate it
+
+# A 7.5 mm rubber foot in each corner of the bridge's base, 1.5 mm in from both
+# edges and standing about 1 mm proud. Each sits in a dimple in the floor, so
+# the bridge rests on the floor.
+FOOT_DIAMETER = 7.5
+FOOT_INSET = 1.5  # from each nearby edge of the bridge
+DIMPLE_DIAMETER = FOOT_DIAMETER + 1
+DIMPLE_DEPTH = 1
 
 # The tray. The walls come up to the top of the bridge.
 FLOOR = 2
@@ -69,11 +80,21 @@ HEX_HEIGHT = 12  # point to point
 HEX_PITCH = 13.4  # across, leaving 3 mm between windows
 HEX_ROW_PITCH = HEX_PITCH * 3**0.5 / 2
 
-# The cable notch in the back wall, for the bridge's power and Ethernet.
-NOTCH_WIDTH = 45
+# The cable notch in the back wall. The Ethernet port is off to one side of
+# the bridge's back, its near side 10 mm from the bridge's edge and its bottom
+# 8 mm up. The notch is symmetric, so that the port clears it on either hand of
+# mount; the micro-USB power port, centred and lower, clears it easily.
+ETHERNET_INSET = 10  # from the bridge's edge to the port's near side
+ETHERNET_BOTTOM = 8  # above the bridge's base
+PORT_MARGIN = 1  # beside the port, for the plug's boot
+NOTCH_WIDTH = BRIDGE_WIDTH - 2 * (ETHERNET_INSET - PORT_MARGIN)
 NOTCH_BOTTOM = FLOOR + 3
-NOTCH_RADIUS = 8  # at the bottom corners
-NOTCH_FLARE = 5  # rounding the top of the wall into the notch
+NOTCH_RADIUS = 4  # at the bottom corners
+NOTCH_FLARE = 1.5  # rounding the top of the wall into the notch
+
+# The test piece: the back of the tray, with the notch and the back two
+# dimples, to check the fit before printing the whole mount.
+TEST_DEPTH = 18
 
 CORNER = (Align.MIN, Align.MIN)
 
@@ -86,6 +107,9 @@ assert NOTCH_WIDTH + 2 * NOTCH_FLARE <= WIDTH - 2 * CORNER_RADIUS, (
 )
 assert NOTCH_BOTTOM + NOTCH_RADIUS <= WALL_HEIGHT - NOTCH_FLARE, (
     "The cable notch's corners overlap"
+)
+assert NOTCH_BOTTOM + NOTCH_RADIUS <= FLOOR + ETHERNET_BOTTOM, (
+    "The cable notch's bottom corners block the Ethernet port"
 )
 
 
@@ -185,9 +209,20 @@ def notch() -> Sketch:
     return cut
 
 
+def dimples() -> Part:
+    """The recesses in the floor for the bridge's feet."""
+    offset = BRIDGE_WIDTH / 2 - FOOT_INSET - FOOT_DIAMETER / 2
+    recesses = Sketch()
+    for x in (-offset, offset):
+        for y in (-offset, offset):
+            recesses += Pos(WIDTH / 2 + x, DEPTH / 2 + y) * Circle(DIMPLE_DIAMETER / 2)
+    return Pos(0, 0, FLOOR - DIMPLE_DEPTH) * extrude(recesses, DIMPLE_DEPTH + 1)
+
+
 def mount(holes: int = 3) -> Part:
     """The left-hand mount, with 2 or 3 screw slots in the ear."""
     part = tray() + ear(holes) + gusset()
+    part -= dimples()
     part -= side(hexagons(DEPTH / 2), -1, WIDTH + 2)
     part -= front(hexagons(WIDTH / 2), -1, WALL + 2)
     part -= front(notch(), DEPTH - WALL - 1, WALL + 2)
@@ -202,7 +237,13 @@ def right(part: Part) -> Part:
 left_3 = mount(3)
 left_2 = mount(2)
 
+# The back of the tray is the same on either hand of mount.
+test_piece = left_3 & Pos(-1, DEPTH - TEST_DEPTH, 0) * Box(
+    WIDTH + 2, TEST_DEPTH + 1, RACK_UNIT, align=(Align.MIN, Align.MIN, Align.MIN)
+)
+
 if __name__ == "__main__":
+    export(test_piece, __file__, variant="test")
     export(right(left_3), __file__, variant="right")
     export(left_2, __file__, variant="2-hole")
     export(right(left_2), __file__, variant="right-2-hole")
