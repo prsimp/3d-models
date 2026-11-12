@@ -11,6 +11,7 @@ models/<name>/
   <name>.py           the model; `make` runs this file
   *.py                helpers used only by this model
   README.md           notes: purpose, material, print settings
+  preview.png         shaded views of the model, written by `make`
   *.3mf               slicer project (Bambu Studio / OrcaSlicer)
   *.stl, *.step       meshes and solids with no source here, e.g. downloads
 build/                rendered output (ignored by git)
@@ -41,6 +42,7 @@ Each model builds a part and, when run as a script, exports it:
 from build123d import Axis, Box, BuildPart, fillet
 
 from common.export import export
+from common.preview import preview
 
 WIDTH = 40
 DEPTH = 20
@@ -51,6 +53,7 @@ with BuildPart() as hook:
     fillet(hook.edges().filter_by(Axis.Z), radius=3)
 
 if __name__ == "__main__":
+    preview(hook.part, __file__)
     export(hook.part, __file__)
 ```
 
@@ -59,6 +62,10 @@ OrcaSlicer import either; STEP keeps true curves rather than a mesh.
 A model can also export variants, such as a test piece: `export(part,
 __file__, variant="test")` writes `build/<name>-test.stl` and `.step`. Export
 variants first; make treats `build/<name>.step` as the sign a model is built.
+
+`preview` writes `preview.png` in the model's folder: two shaded isometric
+views, from the front left and the back right. Show it at the top of the
+model's README. Call it before the main `export`, for the same reason.
 
 Keep parameters as constants at the top of the file. Helpers in a model's
 folder import directly (`import clip`); shared code goes in `common/`.
@@ -75,5 +82,5 @@ make clean     # remove build/
 
 CircleCI runs `make lint` on every push; see `.circleci/config.yml`.
 
-Rendered output is not committed. Commit a slicer `.3mf` project when its print
+Rendered output is not committed, except each model's `preview.png`. Commit a slicer `.3mf` project when its print
 settings are worth keeping, and leave sliced G-code out.
